@@ -8,8 +8,8 @@ type Square struct {
 }
 
 func Notation(notation string) Square {
-	rank := int(notation[1]-'0') - 1
-	file := int(notation[0] - 'a')
+	rank := int(notation[1]-'0')-1
+	file := int(notation[0]-'a')
 	return Square{Rank: rank, File: file}
 }
 
@@ -38,7 +38,6 @@ const (
 )
 
 func (pieceType PieceType) String() string {
-	//return []string{"", "", "", "", "", ""}[pieceType]
 	return []string{"p", "b", "k", "R", "Q", "K"}[pieceType]
 }
 
