@@ -8,18 +8,18 @@ type Square struct {
 }
 
 func Notation(notation string) Square {
-	rank := int(notation[1] - '0') - 1
+	rank := int(notation[1]-'0') - 1
 	file := int(notation[0] - 'a')
 	return Square{Rank: rank, File: file}
 }
 
 func (square Square) String() string {
 	file := []string{"a", "b", "c", "d", "e", "f", "g", "h"}[square.File]
-	return fmt.Sprintf("%s%d", file, square.Rank + 1)
+	return fmt.Sprintf("%s%d", file, square.Rank+1)
 }
 
 func (square Square) IsBlack() bool {
-	return (square.Rank + square.File) % 2 == 0
+	return (square.Rank+square.File)%2 == 0
 }
 
 func (square Square) IsWhite() bool {
@@ -55,15 +55,15 @@ func (side Side) String() string {
 
 type Piece struct {
 	Square Square
-	Type PieceType
-	Side Side
+	Type   PieceType
+	Side   Side
 }
 
 func NewPiece(pieceType PieceType, square Square, side Side) Piece {
 	return Piece{
 		Square: square,
-		Type: pieceType,
-		Side: side,
+		Type:   pieceType,
+		Side:   side,
 	}
 }
 
@@ -138,7 +138,7 @@ func (board Board) Get(square Square) (Piece, bool) {
 		if piece.Square == square {
 			return piece, true
 		}
-	} 
+	}
 
 	return Piece{}, false
 }
@@ -154,7 +154,7 @@ func (board Board) String() string {
 				result += " "
 				continue
 			}
-			
+
 			result += piece.Type.String()
 		}
 

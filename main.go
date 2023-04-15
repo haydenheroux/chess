@@ -7,7 +7,7 @@ import (
 
 type model struct {
 	board Board
-	side Side
+	side  Side
 }
 
 func (m model) Init() tea.Cmd {
@@ -72,8 +72,25 @@ func (m model) renderSquare(square Square) string {
 	return squareStyle.Render(thisPiece)
 }
 
-func (m model) renderWhiteView() string {
-	var result string
+func flip(s0 [][]string) {
+	for l, r := 0, len(s0)-1; l < r; l, r = l+1, r-1 {
+		s0[l], s0[r] = s0[r], s0[l]
+	}
+
+	for _, s1 := range s0 {
+		reverse(s1)
+	}
+}
+
+func reverse(s []string) {
+	for l, r := 0, len(s)-1; l < r; l, r = l+1, r-1 {
+		s[l], s[r] = s[r], s[l]
+	}
+}
+
+func (m model) renderBoard(side Side) string {
+	var board [][]string
+
 	for rank := 7; rank >= 0; rank-- {
 
 		var thisRank []string
@@ -84,42 +101,28 @@ func (m model) renderWhiteView() string {
 			thisRank = append(thisRank, m.renderSquare(square))
 		}
 
-		result += gloss.JoinHorizontal(gloss.Top, thisRank...)
-		result += "\n"
+		board = append(board, thisRank)
 	}
-	
-	return result
-}
 
-func (m model) renderBlackView() string {
-	var result string
-	for rank := 0; rank < 8; rank++ {
-
-		var thisRank []string
-
-		for file := 7; file >= 0; file-- {
-			square := Square{Rank: rank, File: file}
-
-			thisRank = append(thisRank, m.renderSquare(square))
-		}
-
-		result += gloss.JoinHorizontal(gloss.Top, thisRank...)
-		result += "\n"
+	if side == Black {
+		flip(board)
 	}
-	
-	return result
+
+	var view string
+
+	for _, rank := range board {
+		view += gloss.JoinHorizontal(gloss.Top, rank...)
+		view += "\n"
+	}
+
+	return view
 }
 
 func (m model) View() string {
-	if m.side == White {
-		return m.renderWhiteView()
-	} else {
-		return m.renderBlackView()
-	}
+	return m.renderBoard(m.side)
 }
 
 func main() {
-
 	initialModel := model{board: NewBoard(), side: White}
 	initialModel.board = append(initialModel.board, NewPawn(Notation("d6"), Black))
 
