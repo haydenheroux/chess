@@ -8,8 +8,8 @@ type Square struct {
 }
 
 func Notation(notation string) Square {
-	rank := int(notation[1]-'0')-1
-	file := int(notation[0]-'a')
+	rank := int(notation[1]-'0') - 1
+	file := int(notation[0] - 'a')
 	return Square{Rank: rank, File: file}
 }
 
@@ -17,7 +17,6 @@ func (square Square) String() string {
 	file := []string{"a", "b", "c", "d", "e", "f", "g", "h"}[square.File]
 	return fmt.Sprintf("%s%d", file, square.Rank+1)
 }
-
 
 func (square Square) IsBlack() bool {
 	return (square.Rank+square.File)%2 == 0

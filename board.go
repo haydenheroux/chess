@@ -52,32 +52,37 @@ func (board Board) Remove(square Square) {
 }
 
 func (board Board) Pop(square Square) (Piece, bool) {
-	piece, occupied :=  board.Get(square)
-	if !occupied {
-		return Piece{}, false
+	if piece, occupied := board.Get(square); occupied {
+		board.Remove(square)
+		return piece, true
 	}
-	board.Remove(square)
-	return piece, true
+
+	return Piece{}, false
 }
 
-func (board Board) IsOccupied(square Square) bool {
+func (board Board) IsNotEmpty(square Square) bool {
 	_, isOccupied := board.Get(square)
 	return isOccupied
 }
 
-func (board Board) Move(from Square, to Square) bool {
-	if board.IsOccupied(to) {
-		return false
-	}
-	if piece, ok := board.Pop(from); ok {
-		piece.Square = to
-		board[to] = piece
-		return true
-	}
-	return false
+func (board Board) IsEmpty(square Square) bool {
+	return !board.IsNotEmpty(square)
 }
 
-func (board Board) IsOccupiedByAlly(square Square, side Side) bool {
+func (board Board) Move(from Square, to Square) bool {
+	fromIsEmpty := board.IsEmpty(from)
+	toIsNotEmpty := board.IsNotEmpty(to)
+	if fromIsEmpty || toIsNotEmpty {
+		return false
+	}
+
+	piece, _ := board.Pop(from)
+	piece.Square = to
+	board[to] = piece
+	return true
+}
+
+func (board Board) IsAlly(square Square, side Side) bool {
 	piece, isOccupied := board.Get(square)
 	if isOccupied {
 		return piece.Side == side
@@ -85,7 +90,7 @@ func (board Board) IsOccupiedByAlly(square Square, side Side) bool {
 	return false
 }
 
-func (board Board) IsOccupiedByEnemy(square Square, side Side) bool {
+func (board Board) IsEnemy(square Square, side Side) bool {
 	piece, isOccupied := board.Get(square)
 	if isOccupied {
 		return piece.Side != side

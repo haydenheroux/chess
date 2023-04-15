@@ -1,15 +1,15 @@
 package main
 
 import (
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/bubbles/textinput"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 type state int
 
 const (
 	wantSelection state = iota
-	wantMove 
+	wantMove
 )
 
 func (s state) String() string {
@@ -17,10 +17,10 @@ func (s state) String() string {
 }
 
 type model struct {
-	board Board
-	side  Side
+	board     Board
+	side      Side
 	textInput textinput.Model
-	state state
+	state     state
 	selection Square
 }
 
@@ -42,10 +42,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			text := m.textInput.Value()
 			m.textInput.SetValue("")
-			switch (m.state) {
+			switch m.state {
 			case wantSelection:
 				selection := Notation(text)
-				if m.board.IsOccupiedByAlly(selection, m.side) {
+				if m.board.IsAlly(selection, m.side) {
 					m.selection = selection
 					m.state = wantMove
 				}
@@ -76,10 +76,10 @@ func initialModel() model {
 	ti.Focus()
 
 	return model{
-		board: NewBoard(), 
-		side: White,
+		board:     NewBoard(),
+		side:      White,
 		textInput: ti,
-		state: wantSelection,
+		state:     wantSelection,
 		selection: Square{},
 	}
 }
