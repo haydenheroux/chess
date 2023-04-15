@@ -66,15 +66,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var move Square
 				move, m.error = Notation(text)
 				if m.error == nil {
-					isLegalMove := true
-					if isLegalMove {
+					piece, _ := m.board.Get(m.selection)
+					if piece.IsLegalMove(move) {
 						m.error = m.board.Move(m.selection, move)
 						if m.error == nil {
 							m.state = wantSelection
 							m.textInput.Prompt = "Select a piece to move: "
 						}
 					} else {
-						m.error = errors.New("Inputted move was illegal.")
+						m.error = errors.New("Inputted move was not legal.")
 					}
 				}
 			}
