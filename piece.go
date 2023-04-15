@@ -18,6 +18,7 @@ func (square Square) String() string {
 	return fmt.Sprintf("%s%d", file, square.Rank+1)
 }
 
+
 func (square Square) IsBlack() bool {
 	return (square.Rank+square.File)%2 == 0
 }
@@ -88,86 +89,4 @@ func NewQueen(square Square, side Side) Piece {
 
 func NewKing(square Square, side Side) Piece {
 	return NewPiece(King, square, side)
-}
-
-type Board []Piece
-
-func NewBoard() Board {
-	var board Board
-
-	board = append(board, NewRook(Notation("a8"), Black))
-	board = append(board, NewRook(Notation("h8"), Black))
-
-	board = append(board, NewKnight(Notation("b8"), Black))
-	board = append(board, NewKnight(Notation("g8"), Black))
-
-	board = append(board, NewBishop(Notation("c8"), Black))
-	board = append(board, NewBishop(Notation("f8"), Black))
-
-	board = append(board, NewQueen(Notation("d8"), Black))
-	board = append(board, NewKing(Notation("e8"), Black))
-
-	for file := 0; file < 8; file++ {
-		square := Square{Rank: 6, File: file}
-		board = append(board, NewPawn(square, Black))
-	}
-
-	for file := 0; file < 8; file++ {
-		square := Square{Rank: 1, File: file}
-		board = append(board, NewPawn(square, White))
-	}
-
-	board = append(board, NewRook(Notation("a1"), White))
-	board = append(board, NewRook(Notation("h1"), White))
-
-	board = append(board, NewKnight(Notation("b1"), White))
-	board = append(board, NewKnight(Notation("g1"), White))
-
-	board = append(board, NewBishop(Notation("c1"), White))
-	board = append(board, NewBishop(Notation("f1"), White))
-
-	board = append(board, NewQueen(Notation("d1"), White))
-	board = append(board, NewKing(Notation("e1"), White))
-
-	return board
-}
-
-func (board Board) Get(square Square) (Piece, bool) {
-	for _, piece := range board {
-		if piece.Square == square {
-			return piece, true
-		}
-	}
-
-	return Piece{}, false
-}
-
-func (board Board) String() string {
-	var result string
-	for rank := 7; rank >= 0; rank-- {
-		for file := 0; file < 8; file++ {
-			square := Square{Rank: rank, File: file}
-			piece, isOccupied := board.Get(square)
-
-			if !isOccupied {
-				result += " "
-				continue
-			}
-
-			result += piece.Type.String()
-		}
-
-		result += "\n"
-	}
-	return result
-}
-
-func (board Board) IsOccupied(square Square) bool {
-	_, isOccupied := board.Get(square)
-	return isOccupied
-}
-
-func (board Board) IsOccupiedByEnemy(square Square, side Side) bool {
-	piece, isOccupied := board.Get(square)
-	return isOccupied && piece.Side != side
 }

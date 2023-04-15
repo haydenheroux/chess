@@ -5,10 +5,23 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 )
 
+type state int
+
+const (
+	wantSelection state = iota
+	wantMove 
+)
+
+func (s state) String() string {
+	return []string{"wantSelection", "wantMove"}[s]
+}
+
 type model struct {
 	board Board
 	side  Side
 	textInput textinput.Model
+	state state
+	selection Square
 }
 
 func (m model) Init() tea.Cmd {
@@ -27,11 +40,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
+			text := m.textInput.Value()
 			m.textInput.SetValue("")
-			if m.side == White {
-				m.side = Black
-			} else {
-				m.side = White
+			switch (m.state) {
+			case wantSelection:
+				selection := Notation(text)
+				if m.board.IsOccupiedByAlly(selection, m.side) {
+					m.selection = selection
+					m.state = wantMove
+				}
+			case wantMove:
+				move := Notation(text)
+				isLegalMove := true
+				if isLegalMove {
+					_ = m.board.Move(m.selection, move)
+					m.state = wantSelection
+				}
 			}
 
 		}
@@ -42,7 +66,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return m.renderBoard(m.side) + m.textInput.View()
+	return m.renderBoard(m.side) + m.textInput.View() + "\n"
 }
 
 func initialModel() model {
@@ -55,13 +79,13 @@ func initialModel() model {
 		board: NewBoard(), 
 		side: White,
 		textInput: ti,
+		state: wantSelection,
+		selection: Square{},
 	}
 }
 
 func main() {
 	m := initialModel()
-
-	m.board = append(m.board, NewPawn(Notation("d6"), Black))
 
 	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {
