@@ -81,5 +81,5 @@ func (m model) renderInput() string {
 }
 
 func (m model) renderError() string {
-	return errorBox.Render(m.error)
+	return errorBox.Render(m.error.Error())
 }

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	gloss "github.com/charmbracelet/lipgloss"
@@ -23,7 +25,7 @@ type model struct {
 	textInput textinput.Model
 	state     state
 	selection Square
-	error string
+	error error
 }
 
 func (m model) Init() tea.Cmd {
@@ -47,37 +49,32 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.state {
 
 			case wantSelection:
-				selection, ok := Notation(text)
-				if !ok {
-					m.error = "Invalid square input"
-				} else {
+				var selection Square
+				selection, m.error = Notation(text)
+				if m.error == nil {
 					if m.board.IsAlly(selection, m.side) {
 						m.selection = selection
 						m.state = wantMove
 						m.textInput.Prompt = "Select a square to move to: "
-						m.error = ""
+						m.error = nil
 					} else {
-						m.error = "Did not select ally"
+						m.error = errors.New("Inputted square does not contain an ally.")
 					}
 				}
 
 			case wantMove:
-				move, ok := Notation(text)
-				if !ok {
-					m.error = "Invalid square input"
-				} else {
+				var move Square
+				move, m.error = Notation(text)
+				if m.error == nil {
 					isLegalMove := true
 					if isLegalMove {
-						ok := m.board.Move(m.selection, move)
-						if !ok {
-							m.error = "Something happened while moving"
-						} else {
+						m.error = m.board.Move(m.selection, move)
+						if m.error == nil {
 							m.state = wantSelection
 							m.textInput.Prompt = "Select a piece to move: "
-							m.error = ""
 						}
 					} else {
-						m.error = "Illegal move"
+						m.error = errors.New("Inputted move was illegal.")
 					}
 				}
 			}
@@ -91,7 +88,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	view := m.renderBoard() + m.renderInput()
-	if m.error != "" {
+	if m.error != nil {
 		view += m.renderError()
 	}
 	return view

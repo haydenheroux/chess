@@ -1,5 +1,6 @@
 package main
 
+import "errors"
 import "fmt"
 
 type Square struct {
@@ -7,19 +8,19 @@ type Square struct {
 	File int
 }
 
-func Notation(notation string) (Square, bool) {
+func Notation(notation string) (Square, error) {
 	if len(notation) != 2 {
-		return Square{}, false
+		return Square{}, errors.New("Input does not represent a square on the board.")
 	}
 
 	rank := int(notation[1]-'0') - 1
 	file := int(notation[0] - 'a')
 
 	if rank < 0 || rank > 7 || file < 0 || file > 7 {
-		return Square{}, false
+		return Square{}, errors.New("Input does not represent a square on the board.")
 	} 
 
-	return Square{Rank: rank, File: file}, true
+	return Square{Rank: rank, File: file}, nil
 }
 
 func (square Square) String() string {

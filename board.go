@@ -1,5 +1,7 @@
 package main
 
+import "errors"
+
 type Board map[Square]Piece
 
 func NewBoard() Board {
@@ -51,7 +53,7 @@ func (board Board) Set(square Square, piece Piece) bool {
 }
 
 func (board Board) Sets(s string, piece Piece) bool {
-	if square, ok := Notation(s); ok {
+	if square, err := Notation(s); err == nil {
 		return board.Set(square, piece)
 	}
 	return false
@@ -84,16 +86,16 @@ func (board Board) IsEmpty(square Square) bool {
 	return !board.IsNotEmpty(square)
 }
 
-func (board Board) Move(from Square, to Square) bool {
+func (board Board) Move(from Square, to Square) error {
 	fromIsEmpty := board.IsEmpty(from)
 	toIsNotEmpty := board.IsNotEmpty(to)
 	if fromIsEmpty || toIsNotEmpty {
-		return false
+		return errors.New("Unable to move piece.")
 	}
 
 	piece, _ := board.Pop(from)
 	board[to] = piece
-	return true
+	return nil
 }
 
 func (board Board) IsAlly(square Square, side Side) bool {
