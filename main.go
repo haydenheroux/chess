@@ -2,11 +2,13 @@ package main
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/bubbles/textinput"
 )
 
 type model struct {
 	board Board
 	side  Side
+	textInput textinput.Model
 }
 
 func (m model) Init() tea.Cmd {
@@ -14,6 +16,8 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+
 	switch msg := msg.(type) {
 
 	case tea.KeyMsg:
@@ -23,6 +27,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "enter":
+			m.textInput.SetValue("")
 			if m.side == White {
 				m.side = Black
 			} else {
@@ -32,18 +37,33 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	return m, nil
+	m.textInput, cmd = m.textInput.Update(msg)
+	return m, cmd
 }
 
 func (m model) View() string {
-	return m.renderBoard(m.side)
+	return m.renderBoard(m.side) + m.textInput.View()
+}
+
+func initialModel() model {
+
+	ti := textinput.New()
+	ti.Placeholder = "your move..."
+	ti.Focus()
+
+	return model{
+		board: NewBoard(), 
+		side: White,
+		textInput: ti,
+	}
 }
 
 func main() {
-	initialModel := model{board: NewBoard(), side: White}
-	initialModel.board = append(initialModel.board, NewPawn(Notation("d6"), Black))
+	m := initialModel()
 
-	p := tea.NewProgram(initialModel)
+	m.board = append(m.board, NewPawn(Notation("d6"), Black))
+
+	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {
 		//fmt.Printf("Alas, there's been an error: %v", err)
 		//os.Exit(1)
