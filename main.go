@@ -13,7 +13,7 @@ const (
 )
 
 func (s state) String() string {
-	return []string{"wantSelection", "wantMove"}[s]
+	return []string{"Select a piece to move", "Select the position to move to"}[s]
 }
 
 type model struct {
@@ -22,6 +22,7 @@ type model struct {
 	textInput textinput.Model
 	state     state
 	selection Square
+	error string
 }
 
 func (m model) Init() tea.Cmd {
@@ -43,18 +44,32 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			text := m.textInput.Value()
 			m.textInput.SetValue("")
 			switch m.state {
+
 			case wantSelection:
 				selection := Notation(text)
 				if m.board.IsAlly(selection, m.side) {
 					m.selection = selection
 					m.state = wantMove
+					m.textInput.Prompt = "Select a square to move to: "
+					m.error = ""
+				} else {
+					m.error = "Did not select ally"
 				}
+
 			case wantMove:
 				move := Notation(text)
 				isLegalMove := true
 				if isLegalMove {
-					_ = m.board.Move(m.selection, move)
-					m.state = wantSelection
+					ok := m.board.Move(m.selection, move)
+					if !ok {
+						m.error = "Something happened while moving"
+					} else {
+						m.state = wantSelection
+						m.textInput.Prompt = "Select a piece to move: "
+						m.error = ""
+					}
+				} else {
+					m.error = "Illegal move"
 				}
 			}
 
@@ -66,13 +81,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	return m.renderBoard(m.side) + m.textInput.View() + "\n"
+	view := m.renderBoard(m.side) + m.textInput.View() + "\n"
+	if m.error != "" {
+		view += m.renderError()
+	}
+	return view
 }
 
 func initialModel() model {
 
 	ti := textinput.New()
-	ti.Placeholder = "your move..."
+	ti.Placeholder = "..."
+	ti.Prompt = "Select a piece to move: "
 	ti.Focus()
 
 	return model{

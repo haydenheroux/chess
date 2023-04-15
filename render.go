@@ -10,6 +10,8 @@ var (
 
 	blackPiece = gloss.NewStyle().Foreground(gloss.Color("#000000"))
 	whitePiece = gloss.NewStyle().Foreground(gloss.Color("#FFFFFF"))
+
+	errorBox = gloss.NewStyle().Background(gloss.Color("#FF0000")).Foreground(gloss.Color("#FFFFFF")).Width(72).Height(3).PaddingTop(1).PaddingLeft(1)
 )
 
 func (m model) renderSquare(square Square) string {
@@ -70,4 +72,8 @@ func (m model) renderBoard(side Side) string {
 	}
 
 	return view
+}
+
+func (m model) renderError() string {
+	return errorBox.Render(m.error)
 }
