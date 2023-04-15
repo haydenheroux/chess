@@ -38,6 +38,7 @@ const (
 )
 
 func (pieceType PieceType) String() string {
+	//return []string{"", "", "", "", "", ""}[pieceType]
 	return []string{"p", "b", "k", "R", "Q", "K"}[pieceType]
 }
 
