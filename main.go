@@ -47,30 +47,38 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch m.state {
 
 			case wantSelection:
-				selection := Notation(text)
-				if m.board.IsAlly(selection, m.side) {
-					m.selection = selection
-					m.state = wantMove
-					m.textInput.Prompt = "Select a square to move to: "
-					m.error = ""
+				selection, ok := Notation(text)
+				if !ok {
+					m.error = "Invalid square input"
 				} else {
-					m.error = "Did not select ally"
+					if m.board.IsAlly(selection, m.side) {
+						m.selection = selection
+						m.state = wantMove
+						m.textInput.Prompt = "Select a square to move to: "
+						m.error = ""
+					} else {
+						m.error = "Did not select ally"
+					}
 				}
 
 			case wantMove:
-				move := Notation(text)
-				isLegalMove := true
-				if isLegalMove {
-					ok := m.board.Move(m.selection, move)
-					if !ok {
-						m.error = "Something happened while moving"
-					} else {
-						m.state = wantSelection
-						m.textInput.Prompt = "Select a piece to move: "
-						m.error = ""
-					}
+				move, ok := Notation(text)
+				if !ok {
+					m.error = "Invalid square input"
 				} else {
-					m.error = "Illegal move"
+					isLegalMove := true
+					if isLegalMove {
+						ok := m.board.Move(m.selection, move)
+						if !ok {
+							m.error = "Something happened while moving"
+						} else {
+							m.state = wantSelection
+							m.textInput.Prompt = "Select a piece to move: "
+							m.error = ""
+						}
+					} else {
+						m.error = "Illegal move"
+					}
 				}
 			}
 
@@ -92,7 +100,6 @@ func (m model) View() string {
 func initialModel() model {
 
 	ti := textinput.New()
-	ti.Placeholder = "..."
 	ti.Prompt = "Select a piece to move: "
 	ti.PromptStyle = gloss.NewStyle().Foreground(gloss.Color("#f8f8f2")).Background(gloss.Color("#6272a4")).Bold(true)
 	ti.PlaceholderStyle = ti.PromptStyle.Copy().Foreground(gloss.Color("#f8f8f2")).Background(gloss.Color("#6272a4")).Bold(false)

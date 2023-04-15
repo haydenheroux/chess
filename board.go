@@ -51,7 +51,10 @@ func (board Board) Set(square Square, piece Piece) bool {
 }
 
 func (board Board) Sets(s string, piece Piece) bool {
-	return board.Set(Notation(s), piece)
+	if square, ok := Notation(s); ok {
+		return board.Set(square, piece)
+	}
+	return false
 }
 
 func (board Board) Get(square Square) (Piece, bool) {

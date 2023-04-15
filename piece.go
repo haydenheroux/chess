@@ -7,10 +7,19 @@ type Square struct {
 	File int
 }
 
-func Notation(notation string) Square {
+func Notation(notation string) (Square, bool) {
+	if len(notation) != 2 {
+		return Square{}, false
+	}
+
 	rank := int(notation[1]-'0') - 1
 	file := int(notation[0] - 'a')
-	return Square{Rank: rank, File: file}
+
+	if rank < 0 || rank > 7 || file < 0 || file > 7 {
+		return Square{}, false
+	} 
+
+	return Square{Rank: rank, File: file}, true
 }
 
 func (square Square) String() string {
