@@ -5,41 +5,53 @@ type Board map[Square]Piece
 func NewBoard() Board {
 	board := make(Board)
 
-	board[Notation("a8")] = NewRook(Notation("a8"), Black)
-	board[Notation("h8")] = NewRook(Notation("h8"), Black)
+	board.Sets("a8", NewRook(Black))
+	board.Sets("h8", NewRook(Black))
 
-	board[Notation("b8")] = NewKnight(Notation("b8"), Black)
-	board[Notation("g8")] = NewKnight(Notation("g8"), Black)
+	board.Sets("b8", NewKnight(Black))
+	board.Sets("g8", NewKnight(Black))
 
-	board[Notation("c8")] = NewBishop(Notation("c8"), Black)
-	board[Notation("f8")] = NewBishop(Notation("f8"), Black)
+	board.Sets("c8", NewBishop(Black))
+	board.Sets("f8", NewBishop(Black))
 
-	board[Notation("d8")] = NewQueen(Notation("d8"), Black)
-	board[Notation("e8")] = NewKing(Notation("e8"), Black)
+	board.Sets("d8", NewQueen(Black))
+	board.Sets("e8", NewKing(Black))
 
 	for file := 0; file < 8; file++ {
 		square := Square{Rank: 6, File: file}
-		board[square] = NewPawn(square, Black)
+		board.Set(square, NewPawn(Black))
 	}
 
 	for file := 0; file < 8; file++ {
 		square := Square{Rank: 1, File: file}
-		board[square] = NewPawn(square, White)
+		board.Set(square, NewPawn(White))
 	}
 
-	board[Notation("a1")] = NewRook(Notation("a1"), White)
-	board[Notation("h1")] = NewRook(Notation("h1"), White)
+	board.Sets("a1", NewRook(White))
+	board.Sets("h1", NewRook(White))
 
-	board[Notation("b1")] = NewKnight(Notation("b1"), White)
-	board[Notation("g1")] = NewKnight(Notation("g1"), White)
+	board.Sets("b1", NewKnight(White))
+	board.Sets("g1", NewKnight(White))
 
-	board[Notation("c1")] = NewBishop(Notation("c1"), White)
-	board[Notation("f1")] = NewBishop(Notation("f1"), White)
+	board.Sets("c1", NewBishop(White))
+	board.Sets("f1", NewBishop(White))
 
-	board[Notation("d1")] = NewQueen(Notation("d1"), White)
-	board[Notation("e1")] = NewKing(Notation("e1"), White)
+	board.Sets("d1", NewQueen(White))
+	board.Sets("e1", NewKing(White))
 
 	return board
+}
+
+func (board Board) Set(square Square, piece Piece) bool {
+	if empty := board.IsEmpty(square); empty {
+		board[square] = piece
+		return true
+	}
+	return false
+}
+
+func (board Board) Sets(s string, piece Piece) bool {
+	return board.Set(Notation(s), piece)
 }
 
 func (board Board) Get(square Square) (Piece, bool) {
@@ -77,7 +89,6 @@ func (board Board) Move(from Square, to Square) bool {
 	}
 
 	piece, _ := board.Pop(from)
-	piece.Square = to
 	board[to] = piece
 	return true
 }

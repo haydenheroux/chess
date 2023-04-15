@@ -53,39 +53,37 @@ func (side Side) String() string {
 }
 
 type Piece struct {
-	Square Square
 	Type   PieceType
 	Side   Side
 }
 
-func NewPiece(pieceType PieceType, square Square, side Side) Piece {
+func NewPiece(pieceType PieceType, side Side) Piece {
 	return Piece{
-		Square: square,
 		Type:   pieceType,
 		Side:   side,
 	}
 }
 
-func NewPawn(square Square, side Side) Piece {
-	return NewPiece(Pawn, square, side)
+func NewPawn(side Side) Piece {
+	return NewPiece(Pawn, side)
 }
 
-func NewBishop(square Square, side Side) Piece {
-	return NewPiece(Bishop, square, side)
+func NewBishop(side Side) Piece {
+	return NewPiece(Bishop, side)
 }
 
-func NewKnight(square Square, side Side) Piece {
-	return NewPiece(Knight, square, side)
+func NewKnight(side Side) Piece {
+	return NewPiece(Knight, side)
 }
 
-func NewRook(square Square, side Side) Piece {
-	return NewPiece(Rook, square, side)
+func NewRook(side Side) Piece {
+	return NewPiece(Rook, side)
 }
 
-func NewQueen(square Square, side Side) Piece {
-	return NewPiece(Queen, square, side)
+func NewQueen(side Side) Piece {
+	return NewPiece(Queen, side)
 }
 
-func NewKing(square Square, side Side) Piece {
-	return NewPiece(King, square, side)
+func NewKing(side Side) Piece {
+	return NewPiece(King, side)
 }
