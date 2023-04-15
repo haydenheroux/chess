@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	gloss "github.com/charmbracelet/lipgloss"
 )
 
 type state int
@@ -81,7 +82,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	view := m.renderBoard(m.side) + m.textInput.View() + "\n"
+	view := m.renderBoard() + m.renderInput()
 	if m.error != "" {
 		view += m.renderError()
 	}
@@ -93,6 +94,10 @@ func initialModel() model {
 	ti := textinput.New()
 	ti.Placeholder = "..."
 	ti.Prompt = "Select a piece to move: "
+	ti.PromptStyle = gloss.NewStyle().Foreground(gloss.Color("#f8f8f2")).Background(gloss.Color("#6272a4")).Bold(true)
+	ti.PlaceholderStyle = ti.PromptStyle.Copy().Foreground(gloss.Color("#f8f8f2")).Background(gloss.Color("#6272a4")).Bold(false)
+	ti.TextStyle = ti.PromptStyle.Copy().Foreground(gloss.Color("#f8f8f2")).Background(gloss.Color("#6272a4")).Bold(false)
+
 	ti.Focus()
 
 	return model{

@@ -5,13 +5,15 @@ import (
 )
 
 var (
-	blackSquare = gloss.NewStyle().Background(gloss.Color("#3E73D6")).Width(9).Height(3).PaddingTop(1).PaddingLeft(4)
-	whiteSquare = blackSquare.Copy().Background(gloss.Color("#1466FF"))
+	blackSquare = gloss.NewStyle().Width(9).Height(3).PaddingTop(1).PaddingLeft(4).Background(gloss.Color("#6272a4"))
+	whiteSquare = blackSquare.Copy().Background(gloss.Color("#ff79c6"))
 
-	blackPiece = gloss.NewStyle().Foreground(gloss.Color("#000000"))
-	whitePiece = gloss.NewStyle().Foreground(gloss.Color("#FFFFFF"))
+	blackPiece = gloss.NewStyle().Foreground(gloss.Color("#000000")).Bold(true)
+	whitePiece = gloss.NewStyle().Foreground(gloss.Color("#ffffff")).Bold(true)
 
-	errorBox = gloss.NewStyle().Background(gloss.Color("#FF0000")).Foreground(gloss.Color("#FFFFFF")).Width(72).Height(3).PaddingTop(1).PaddingLeft(1)
+	inputBox = gloss.NewStyle().Background(gloss.Color("#6272a4")).Foreground(gloss.Color("#f8f8f2")).Width(70).Height(3).PaddingTop(1).PaddingLeft(1).BorderStyle(gloss.NormalBorder()).BorderForeground(gloss.Color("#f8f8f2")).BorderBackground(gloss.Color("#6272a4")).MarginTop(1)
+
+	errorBox = inputBox.Copy().Background(gloss.Color("#ff5555")).BorderBackground(gloss.Color("#ff5555")).MarginTop(1).Bold(true)
 )
 
 func (m model) renderSquare(square Square) string {
@@ -44,7 +46,7 @@ func (m model) renderSquare(square Square) string {
 	return squareStyle.Render(thisPiece)
 }
 
-func (m model) renderBoard(side Side) string {
+func (m model) renderBoard() string {
 	var board [][]string
 
 	for rank := 7; rank >= 0; rank-- {
@@ -60,7 +62,7 @@ func (m model) renderBoard(side Side) string {
 		board = append(board, thisRank)
 	}
 
-	if side == Black {
+	if m.side == Black {
 		flip(board)
 	}
 
@@ -72,6 +74,10 @@ func (m model) renderBoard(side Side) string {
 	}
 
 	return view
+}
+
+func (m model) renderInput() string {
+	return inputBox.Render(m.textInput.View())
 }
 
 func (m model) renderError() string {
