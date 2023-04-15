@@ -7,6 +7,7 @@ import (
 
 type model struct {
 	board Board
+	side Side
 }
 
 func (m model) Init() tea.Cmd {
@@ -22,6 +23,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 
+		case "enter":
+			if m.side == White {
+				m.side = Black
+			} else {
+				m.side = White
+			}
+
 		}
 	}
 
@@ -34,7 +42,37 @@ var whiteSquare = blackSquare.Copy().Background(gloss.Color("#1466FF"))
 var blackPiece = gloss.NewStyle().Foreground(gloss.Color("#000000"))
 var whitePiece = gloss.NewStyle().Foreground(gloss.Color("#FFFFFF"))
 
-func (m model) View() string {
+func (m model) renderSquare(square Square) string {
+	var squareStyle gloss.Style
+
+	if square.IsBlack() {
+		squareStyle = blackSquare
+	} else {
+		squareStyle = whiteSquare
+	}
+
+	piece, isOccupied := m.board.Get(square)
+
+	thisPiece := " "
+
+	if isOccupied {
+		pieceType := piece.Type.String()
+
+		var pieceStyle gloss.Style
+
+		if piece.Side == Black {
+			pieceStyle = blackPiece
+		} else {
+			pieceStyle = whitePiece
+		}
+
+		thisPiece = pieceStyle.Render(pieceType)
+	}
+
+	return squareStyle.Render(thisPiece)
+}
+
+func (m model) renderWhiteView() string {
 	var result string
 	for rank := 7; rank >= 0; rank-- {
 
@@ -43,32 +81,7 @@ func (m model) View() string {
 		for file := 0; file < 8; file++ {
 			square := Square{Rank: rank, File: file}
 
-			var squareStyle gloss.Style
-			if square.IsBlack() {
-				squareStyle = blackSquare
-			} else {
-				squareStyle = whiteSquare
-			}
-
-			piece, isOccupied := m.board.Get(square)
-
-			thisPiece := " "
-
-			if isOccupied {
-				pieceType := piece.Type.String()
-
-				var pieceStyle gloss.Style
-
-				if piece.Side == Black {
-					pieceStyle = blackPiece
-				} else {
-					pieceStyle = whitePiece
-				}
-
-				thisPiece = pieceStyle.Render(pieceType)
-			}
-
-			thisRank = append(thisRank, squareStyle.Render(thisPiece))
+			thisRank = append(thisRank, m.renderSquare(square))
 		}
 
 		result += gloss.JoinHorizontal(gloss.Top, thisRank...)
@@ -78,9 +91,37 @@ func (m model) View() string {
 	return result
 }
 
+func (m model) renderBlackView() string {
+	var result string
+	for rank := 0; rank < 8; rank++ {
+
+		var thisRank []string
+
+		for file := 7; file >= 0; file-- {
+			square := Square{Rank: rank, File: file}
+
+			thisRank = append(thisRank, m.renderSquare(square))
+		}
+
+		result += gloss.JoinHorizontal(gloss.Top, thisRank...)
+		result += "\n"
+	}
+	
+	return result
+}
+
+func (m model) View() string {
+	if m.side == White {
+		return m.renderWhiteView()
+	} else {
+		return m.renderBlackView()
+	}
+}
+
 func main() {
 
-	initialModel := model{board: NewBoard()}
+	initialModel := model{board: NewBoard(), side: White}
+	initialModel.board = append(initialModel.board, NewPawn(Notation("d6"), Black))
 
 	p := tea.NewProgram(initialModel)
 	if _, err := p.Run(); err != nil {
