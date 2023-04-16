@@ -35,7 +35,16 @@ func (board Board) LegalMoves(piece Piece, square Square) []Square {
 		} else {
 			limit = 2
 		}
-		return board.verticalSquaresUntilObstructedWithLimit(square, direction, limit)
+		moves := board.verticalSquaresUntilObstructedWithLimit(square, direction, limit)
+		diagonalPositive := Square{Rank: square.Rank + int(direction), File: square.File + int(Positive)}
+		diagonalNegative := Square{Rank: square.Rank + int(direction), File: square.File + int(Negative)}
+		if board.IsEnemy(diagonalPositive, piece.Side) {
+			moves = append(moves, diagonalPositive)
+		}
+		if board.IsEnemy(diagonalNegative, piece.Side) {
+			moves = append(moves, diagonalNegative)
+		}
+		return moves
 	case Bishop:
 	case Knight:
 	case Rook:
