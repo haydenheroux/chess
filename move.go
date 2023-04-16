@@ -46,7 +46,16 @@ func (board Board) LegalMoves(piece Piece, square Square) []Square {
 		}
 		return moves
 	case Bishop:
+		posPos := board.diagonalUntilEnemy(square, Positive, Positive, piece.Side)
+		negPos := board.diagonalUntilEnemy(square, Negative, Positive, piece.Side)
+		negNeg := board.diagonalUntilEnemy(square, Negative, Negative, piece.Side)
+		posNeg := board.diagonalUntilEnemy(square, Positive, Negative, piece.Side)
+		moves := append(posPos, negPos...)
+		moves = append(moves, negNeg...)
+		moves = append(moves, posNeg...)
+		return moves
 	case Knight:
+		return []Square{}
 	case Rook:
 		positiveRanks := board.ranksUntilEnemy(square, Positive, piece.Side)
 		negativeRanks := board.ranksUntilEnemy(square, Negative, piece.Side)
@@ -57,6 +66,7 @@ func (board Board) LegalMoves(piece Piece, square Square) []Square {
 		moves = append(moves, negativeFiles...)
 		return moves
 	case Queen:
+		return []Square{}
 	case King:
 		return []Square{}
 	}
@@ -90,6 +100,22 @@ func (board Board) files(from Square, direction Direction) []Square {
 	return squares
 }
 
+func (board Board) diagonal(from Square, rankDirection Direction, fileDirection Direction) []Square {
+	var squares []Square
+	initRank := from.Rank + int(rankDirection)
+	initFile := from.File + int(fileDirection)
+	for rank := initRank; rank >= 0 && rank < 8; rank += int(rankDirection) {
+		for file := initFile; file >= 0 && file < 8; file += int(fileDirection) {
+			square := Square{Rank: rank, File: file}
+			if board.IsNotEmpty(square) {
+				break
+			}
+			squares = append(squares, square)
+		}
+	}
+	return squares
+}
+
 func (board Board) ranksUntilEnemy(from Square, direction Direction, side Side) []Square {
 	var squares []Square
 	init := from.Rank + int(direction)
@@ -117,6 +143,25 @@ func (board Board) filesUntilEnemy(from Square, direction Direction, side Side) 
 		squares = append(squares, square)
 		if board.IsEnemy(square, side) {
 			break
+		}
+	}
+	return squares
+}
+
+func (board Board) diagonalUntilEnemy(from Square, rankDirection Direction, fileDirection Direction, side Side) []Square {
+	var squares []Square
+	initRank := from.Rank + int(rankDirection)
+	initFile := from.File + int(fileDirection)
+	for rank := initRank; rank >= 0 && rank < 8; rank += int(rankDirection) {
+		for file := initFile; file >= 0 && file < 8; file += int(fileDirection) {
+			square := Square{Rank: rank, File: file}
+			if board.IsAlly(square, side) {
+				break
+			}
+			squares = append(squares, square)
+			if board.IsEnemy(square, side) {
+				break
+			}
 		}
 	}
 	return squares
