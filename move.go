@@ -66,7 +66,22 @@ func (board Board) LegalMoves(piece Piece, square Square) []Square {
 		moves = append(moves, negativeFiles...)
 		return moves
 	case Queen:
-		return []Square{}
+		positiveRanks := board.ranksUntilEnemy(square, Positive, piece.Side)
+		negativeRanks := board.ranksUntilEnemy(square, Negative, piece.Side)
+		positiveFiles := board.filesUntilEnemy(square, Positive, piece.Side)
+		negativeFiles := board.filesUntilEnemy(square, Negative, piece.Side)
+		posPos := board.diagonalUntilEnemy(square, Positive, Positive, piece.Side)
+		negPos := board.diagonalUntilEnemy(square, Negative, Positive, piece.Side)
+		negNeg := board.diagonalUntilEnemy(square, Negative, Negative, piece.Side)
+		posNeg := board.diagonalUntilEnemy(square, Positive, Negative, piece.Side)
+		moves := append(positiveRanks, negativeRanks...)
+		moves = append(moves, positiveFiles...)
+		moves = append(moves, negativeFiles...)
+		moves = append(moves, posPos...)
+		moves = append(moves, negPos...)
+		moves = append(moves, negNeg...)
+		moves = append(moves, posNeg...)
+		return moves
 	case King:
 		return []Square{}
 	}
