@@ -64,6 +64,13 @@ func (board Board) Get(square Square) (Piece, bool) {
 	return val, ok
 }
 
+func (board Board) Gets(s string) (Piece, bool) {
+	if square, err := Notation(s); err == nil {
+		return board.Get(square)
+	}
+	return Piece{}, false
+}
+
 func (board Board) Remove(square Square) {
 	delete(board, square)
 }
@@ -94,6 +101,7 @@ func (board Board) Move(from Square, to Square) error {
 	}
 
 	piece, _ := board.Pop(from)
+	piece.HasMoved = true
 	board[to] = piece
 	return nil
 }

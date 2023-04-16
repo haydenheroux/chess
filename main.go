@@ -67,9 +67,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				move, m.error = Notation(text)
 				if m.error == nil {
 					piece, _ := m.board.Get(m.selection)
-					if piece.IsLegalMove(move) {
+					if m.board.IsLegalMove(piece, m.selection, move) {
+						if m.board.IsNotEmpty(move) {
+							m.board.Remove(move)
+						}
 						m.error = m.board.Move(m.selection, move)
 						if m.error == nil {
+							if m.side == White {
+								m.side = Black
+							} else {
+								m.side = White
+							}
 							m.state = wantSelection
 							m.textInput.Prompt = "Select a piece to move: "
 						}

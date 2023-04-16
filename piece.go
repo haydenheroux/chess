@@ -65,12 +65,14 @@ func (side Side) String() string {
 type Piece struct {
 	Type   PieceType
 	Side   Side
+	HasMoved bool
 }
 
 func NewPiece(pieceType PieceType, side Side) Piece {
 	return Piece{
 		Type:   pieceType,
 		Side:   side,
+		HasMoved: false,
 	}
 }
 

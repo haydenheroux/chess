@@ -4,8 +4,8 @@ import "testing"
 
 func TestBoardMove(t *testing.T) {
 	board := NewBoard()
-	from := Notation("a2")
-	to := Notation("a3")
+	from, _ := Notation("a2")
+	to, _ := Notation("a3")
 
 	_ = board.Move(from, to)
 
@@ -20,12 +20,12 @@ func TestBoardMove(t *testing.T) {
 
 func TestBoardMoveOntoOccupied(t *testing.T) {
 	board := NewBoard()
-	from := Notation("a2")
-	to := Notation("a7")
+	from, _ := Notation("a2")
+	to, _ := Notation("a7")
 
 	ok := board.Move(from, to)
 
-	if ok {
+	if ok == nil {
 		t.Errorf("Move was okay when it should not have been")
 	}
 
@@ -40,12 +40,12 @@ func TestBoardMoveOntoOccupied(t *testing.T) {
 
 func TestBoardMoveThereAndBack(t *testing.T) {
 	board := NewBoard()
-	from := Notation("a2")
-	to := Notation("b4")
+	from, _ := Notation("a2")
+	to, _ := Notation("b4")
 
 	ok := board.Move(from, to)
 
-	if !ok {
+	if ok != nil {
 		t.Errorf("Move was not okay, but it should have been okay")
 	}
 
@@ -59,7 +59,7 @@ func TestBoardMoveThereAndBack(t *testing.T) {
 
 	ok = board.Move(to, from)
 
-	if !ok {
+	if ok != nil {
 		t.Errorf("Move was not okay, but it should have been okay")
 	}
 
