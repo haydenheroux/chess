@@ -114,14 +114,12 @@ func (board Board) diagonal(from Square, rankDirection Direction, fileDirection 
 	var squares []Square
 	initRank := from.Rank + int(rankDirection)
 	initFile := from.File + int(fileDirection)
-	for rank := initRank; rank >= 0 && rank < 8; rank += int(rankDirection) {
-		for file := initFile; file >= 0 && file < 8; file += int(fileDirection) {
-			square := Square{Rank: rank, File: file}
-			if board.IsNotEmpty(square) {
-				break
-			}
-			squares = append(squares, square)
+	for rank, file := initRank, initFile; rank >= 0 && rank < 8 && file >= 0 && file < 8; rank, file = rank + int(rankDirection), file + int(fileDirection) {
+		square := Square{Rank: rank, File: file}
+		if board.IsNotEmpty(square) {
+			break
 		}
+		squares = append(squares, square)
 	}
 	return squares
 }
@@ -162,16 +160,15 @@ func (board Board) diagonalUntilEnemy(from Square, rankDirection Direction, file
 	var squares []Square
 	initRank := from.Rank + int(rankDirection)
 	initFile := from.File + int(fileDirection)
-	for rank := initRank; rank >= 0 && rank < 8; rank += int(rankDirection) {
-		for file := initFile; file >= 0 && file < 8; file += int(fileDirection) {
-			square := Square{Rank: rank, File: file}
-			if board.IsAlly(square, side) {
-				break
-			}
-			squares = append(squares, square)
-			if board.IsEnemy(square, side) {
-				break
-			}
+
+	for rank, file := initRank, initFile; rank >= 0 && rank < 8 && file >= 0 && file < 8; rank, file = rank + int(rankDirection), file + int(fileDirection) {
+		square := Square{Rank: rank, File: file}
+		if board.IsAlly(square, side) {
+			return squares
+		}
+		squares = append(squares, square)
+		if board.IsEnemy(square, side) {
+			return squares
 		}
 	}
 	return squares
