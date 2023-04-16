@@ -46,47 +46,42 @@ func (board Board) LegalMoves(piece Piece, square Square) []Square {
 		}
 		return moves
 	case Bishop:
-		posPos := board.diagonalUntilEnemy(square, Positive, Positive, piece.Side)
-		negPos := board.diagonalUntilEnemy(square, Negative, Positive, piece.Side)
-		negNeg := board.diagonalUntilEnemy(square, Negative, Negative, piece.Side)
-		posNeg := board.diagonalUntilEnemy(square, Positive, Negative, piece.Side)
-		moves := append(posPos, negPos...)
-		moves = append(moves, negNeg...)
-		moves = append(moves, posNeg...)
-		return moves
+		return board.legalBishopMoves(square, piece.Side)
 	case Knight:
 		return []Square{}
 	case Rook:
-		positiveRanks := board.ranksUntilEnemy(square, Positive, piece.Side)
-		negativeRanks := board.ranksUntilEnemy(square, Negative, piece.Side)
-		positiveFiles := board.filesUntilEnemy(square, Positive, piece.Side)
-		negativeFiles := board.filesUntilEnemy(square, Negative, piece.Side)
-		moves := append(positiveRanks, negativeRanks...)
-		moves = append(moves, positiveFiles...)
-		moves = append(moves, negativeFiles...)
-		return moves
+		return board.legalRookMoves(square, piece.Side)
 	case Queen:
-		positiveRanks := board.ranksUntilEnemy(square, Positive, piece.Side)
-		negativeRanks := board.ranksUntilEnemy(square, Negative, piece.Side)
-		positiveFiles := board.filesUntilEnemy(square, Positive, piece.Side)
-		negativeFiles := board.filesUntilEnemy(square, Negative, piece.Side)
-		posPos := board.diagonalUntilEnemy(square, Positive, Positive, piece.Side)
-		negPos := board.diagonalUntilEnemy(square, Negative, Positive, piece.Side)
-		negNeg := board.diagonalUntilEnemy(square, Negative, Negative, piece.Side)
-		posNeg := board.diagonalUntilEnemy(square, Positive, Negative, piece.Side)
-		moves := append(positiveRanks, negativeRanks...)
-		moves = append(moves, positiveFiles...)
-		moves = append(moves, negativeFiles...)
-		moves = append(moves, posPos...)
-		moves = append(moves, negPos...)
-		moves = append(moves, negNeg...)
-		moves = append(moves, posNeg...)
-		return moves
+		bishop := board.legalBishopMoves(square, piece.Side)
+		rook := board.legalRookMoves(square, piece.Side)
+		return append(bishop, rook...)
 	case King:
 		return []Square{}
 	}
 
 	return []Square{}
+}
+
+func (board Board) legalBishopMoves(from Square, side Side) []Square {
+	pp := board.diagonalUntilEnemy(from, Positive, Positive, side)
+	np := board.diagonalUntilEnemy(from, Negative, Positive, side)
+	nn := board.diagonalUntilEnemy(from, Negative, Negative, side)
+	pn := board.diagonalUntilEnemy(from, Positive, Negative, side)
+	moves := append(pp, np...)
+	moves = append(moves, nn...)
+	moves = append(moves, pn...)
+	return moves
+}
+
+func (board Board) legalRookMoves(from Square, side Side) []Square {
+	pr := board.ranksUntilEnemy(from, Positive, side)
+	nr := board.ranksUntilEnemy(from, Negative, side)
+	pf := board.filesUntilEnemy(from, Positive, side)
+	nf := board.filesUntilEnemy(from, Negative, side)
+	moves := append(pr, nr...)
+	moves = append(moves, pf...)
+	moves = append(moves, nf...)
+	return moves
 }
 
 func (board Board) ranks(from Square, direction Direction) []Square {
