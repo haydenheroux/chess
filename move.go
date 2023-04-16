@@ -35,7 +35,7 @@ func (board Board) LegalMoves(piece Piece, square Square) []Square {
 		} else {
 			limit = 2
 		}
-		moves := board.verticalSquaresUntilObstructedWithLimit(square, direction, limit)
+		moves := board.ranksUntilLimit(square, direction, limit)
 		diagonalPositive := Square{Rank: square.Rank + int(direction), File: square.File + int(Positive)}
 		diagonalNegative := Square{Rank: square.Rank + int(direction), File: square.File + int(Negative)}
 		if board.IsEnemy(diagonalPositive, piece.Side) {
@@ -48,13 +48,13 @@ func (board Board) LegalMoves(piece Piece, square Square) []Square {
 	case Bishop:
 	case Knight:
 	case Rook:
-		positiveVertical := board.verticalSquaresUntilEnemy(square, Positive, piece.Side)
-		negativeVertical := board.verticalSquaresUntilEnemy(square, Negative, piece.Side)
-		positiveHorizontal := board.horizontalSquaresUntilEnemy(square, Positive, piece.Side)
-		negativeHorizontal := board.horizontalSquaresUntilEnemy(square, Negative, piece.Side)
-		moves := append(positiveVertical, negativeVertical...)
-		moves = append(moves, positiveHorizontal...)
-		moves = append(moves, negativeHorizontal...)
+		positiveRanks := board.ranksUntilEnemy(square, Positive, piece.Side)
+		negativeRanks := board.ranksUntilEnemy(square, Negative, piece.Side)
+		positiveFiles := board.filesUntilEnemy(square, Positive, piece.Side)
+		negativeFiles := board.filesUntilEnemy(square, Negative, piece.Side)
+		moves := append(positiveRanks, negativeRanks...)
+		moves = append(moves, positiveFiles...)
+		moves = append(moves, negativeFiles...)
 		return moves
 	case Queen:
 	case King:
@@ -64,7 +64,7 @@ func (board Board) LegalMoves(piece Piece, square Square) []Square {
 	return []Square{}
 }
 
-func (board Board) verticalSquaresUntilObstructed(from Square, direction Direction) []Square {
+func (board Board) ranks(from Square, direction Direction) []Square {
 	var squares []Square
 	init := from.Rank + int(direction)
 	for rank := init; rank >= 0 && rank < 8; rank += int(direction) {
@@ -77,7 +77,7 @@ func (board Board) verticalSquaresUntilObstructed(from Square, direction Directi
 	return squares
 }
 
-func (board Board) horizontalSquaresUntilObstructed(from Square, direction Direction) []Square {
+func (board Board) files(from Square, direction Direction) []Square {
 	var squares []Square
 	init := from.File + int(direction)
 	for file := init; file >= 0 && file < 8; file += int(direction) {
@@ -90,7 +90,7 @@ func (board Board) horizontalSquaresUntilObstructed(from Square, direction Direc
 	return squares
 }
 
-func (board Board) verticalSquaresUntilEnemy(from Square, direction Direction, side Side) []Square {
+func (board Board) ranksUntilEnemy(from Square, direction Direction, side Side) []Square {
 	var squares []Square
 	init := from.Rank + int(direction)
 	for rank := init; rank >= 0 && rank < 8; rank += int(direction) {
@@ -106,7 +106,7 @@ func (board Board) verticalSquaresUntilEnemy(from Square, direction Direction, s
 	return squares
 }
 
-func (board Board) horizontalSquaresUntilEnemy(from Square, direction Direction, side Side) []Square {
+func (board Board) filesUntilEnemy(from Square, direction Direction, side Side) []Square {
 	var squares []Square
 	init := from.File + int(direction)
 	for file := init; file >= 0 && file < 8; file += int(direction) {
@@ -122,7 +122,7 @@ func (board Board) horizontalSquaresUntilEnemy(from Square, direction Direction,
 	return squares
 }
 
-func (board Board) verticalSquaresUntilObstructedWithLimit(from Square, direction Direction, limit int) []Square {
+func (board Board) ranksUntilLimit(from Square, direction Direction, limit int) []Square {
 	var squares []Square
 	init := from.Rank + int(direction)
 	for rank := init; rank >= 0 && rank < 8; rank += int(direction) {
@@ -136,7 +136,7 @@ func (board Board) verticalSquaresUntilObstructedWithLimit(from Square, directio
 	return squares
 }
 
-func (board Board) horizontalSquaresUntilObstructedWithLimit(from Square, direction Direction, limit int) []Square {
+func (board Board) filesUntilLimit(from Square, direction Direction, limit int) []Square {
 	var squares []Square
 	init := from.File + int(direction)
 	for file := init; file >= 0 && file < 8; file += int(direction) {
